@@ -1,10 +1,25 @@
+import sys
 from random import choice
 from time import sleep
 
 a = "aiueo"
 b = "bcdfghjklmnpqrstvwxyz"
-length = int(input("Length (5): ") or 5)
-auto = bool(input("Auto drive (false): "))
+isBulk = False
+bulkNum = 1
+length = 5
+auto = False
+
+if len(sys.argv) > 1:
+	isBulk = sys.argv[1] == "--bulk"
+
+if isBulk and len(sys.argv) > 2:
+	bulkNum = int(sys.argv[2])
+elif len(sys.argv) == 2:
+	print("USAGE: --bulk <num>")
+	exit()
+else:
+	length = int(input("Length (5): ") or 5)
+	auto = bool(input("Auto drive (false): "))
 
 def suggest(l):
 	f = "a"
@@ -18,24 +33,30 @@ def suggest(l):
 			f += choice(a)
 	return f[1:l+1]
 
-print("Enter/Return - Get more suggestion")
+if not isBulk:
+	print("Enter/Return - Get more suggestion")
 
-if not auto:
+if not auto and not isBulk:
 	print("q/ctrl+c - Quit")
-else:
+elif not isBulk:
 	print("ctrl+c - Quit")
 
-while True:
+while bulkNum > 0:
 	suggestion = suggest(length)
 
 	try:
-		if not auto:
+		if not auto and not isBulk:
 			print(suggestion, end="")
 			inp = input()
 			if inp == "q":
 				break
-		else:
+		elif auto:
 			print(suggestion)
 			sleep(1)
+		elif isBulk:
+			print(suggestion)
 	except KeyboardInterrupt:
 		break
+
+	if isBulk:
+		bulkNum -= 1
